@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="display-1 text-center">Colorizer</h1>
+
+    <div class="container" align="center" style="width: 65%;margin-top: 50px;margin-left: 25%">
+        <form enctype="multipart/form-data" class="form-inline"  action="upload" method="POST">
+            <div class="form-group">
+                <input type="file" accept=".jpg,.png,.jpeg" class="btn btn-primary" name="upload" multiple/>
+            </div>
+            <button type="submit" class="btn btn-danger ml-4">Get results!</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="container mt-5">
+        <div style="display: flex; justify-content: center;">
+            <img alt="sample" width="500" height="300" src="./uploads/{{file}}">
+        </div>
+        <table class="table mt-5">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">Color</th>
+                <th scope="col">RGBA</th>
+                <th scope="col">Hex</th>
+                <th scope="col">Percentage</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pair in pairs %}
+            <tr>
+                <th scope="row"> <div style="background-color: {{pair.Pixel.ToHex}};width: 30px;height: 30px;border-style: solid;border-width: 1px"></div></th>
+                <td><small style="color: red;">R:</small> {{pair.Pixel.R}},
+                    <small style="color: green;">G:</small> {{pair.Pixel.G}},
+                    <small style="color: blue;">B:</small> {{pair.Pixel.B}},
+                    <small style="color: black;">A:</small> {{pair.Pixel.A}}</td>
+                <td>{{pair.Pixel.ToHex}}</td>
+                <td>{{pair.Percentage}}% <small>({{pair.Amount}})</small></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <canvas id="dataChart" class="mt-5" width="700" height="300"></canvas>
+        <script>
+            const ctx = document.getElementById('dataChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    datasets:[{
+                        "label":"Color Chart",
+                        "data":[
+                            //{% for pair in pairs %}
+                                "{{pair.Amount}}",
+                            //{% endfor %}
+                        ],
+                        "backgroundColor":[
+                            //{% for pair in pairs %}
+                                "{{pair.Pixel.ToRGBString}}",
+                            //{% endfor %}
+                        ]
+                    }],
+
+                    labels: [
+                        //{% for pair in pairs %}
+                            "{{pair.Pixel.ToHex}}",
+                        //{% endfor %}
+                    ]
+                },
+
+                options: {}
+            });
+        </script>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
